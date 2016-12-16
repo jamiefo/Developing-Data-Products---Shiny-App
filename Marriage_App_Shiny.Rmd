@@ -1,0 +1,63 @@
+---
+title: "Marriage_Shiny_App"
+author: "jamiefo"
+date: "December 13, 2016"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Marriage Data
+
+I wanted to explore Marriage Data across the world. 
+
+Citation: United Nations, Department of Economic and Social Affairs, Population Division (2013). World Marriage Data 2012 (POP/DB/Marr/Rev2012).
+
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+#install.packages("plotly")
+library("plotly")
+library("tidyr")
+library("dplyr")
+
+setwd("C:/Users/uszlj8j/Desktop/")
+Marriage <- read.csv("Marriage.csv")
+Marriage2 <- Marriage %>% filter(Year >= 1970 & Year <= 2011,
+                                 Marital_.status %in% c('Married','Single','Widowed','Divorced','Separated'),
+                                 Sex %in% c('Men','Women'),
+                                 !is.na(age_30_34)) %>% select(-ISO_code,-Period,-Source,-Source_type)
+
+Marriage3 <- Marriage2 %>% gather(Maritial_Age,Marital_status_prc,c(age_15_19,age_20_24,age_25_29,age_30_34,age_35_39,age_40_44,age_45_49, age_50_54,age_55_59,age_60_64,age_65_and_over))
+
+head(Marriage3,8)
+
+```
+
+
+## Shiny App descripton
+
+The Shiny App that I put together looks at Marriage Data in an interactive Plotly graph.  You 
+can filter by Year and Color to get different views of the data.
+
+![Alt text](C:/Users/uszlj8j/Desktop/Learning R/Data Science CourseRA/R_Developing_Data_Products/DDP_1_shiny_app/Marriage.jpg)
+
+
+## Plotly Graph1 of Marriage Data
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+M <- ggplot(data = Marriage3, aes(x = Marriage3$Year, y = Marriage3$Marital_status_prc)) +
+     geom_smooth(aes(colour = Marriage3$Marital_status))
+
+ggplotly(M)
+```
+
+## Plotly Graph2 of Marriage Data
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+M <- ggplot(data = Marriage3, aes(x = Marriage3$Year, y = Marriage3$Marital_status_prc)) +
+     geom_smooth(aes(colour = Marriage3$Maritial_Age), se = FALSE)
+
+ggplotly(M)
+```
